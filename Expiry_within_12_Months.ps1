@@ -1,6 +1,6 @@
 ﻿Import-Module WebAdministration -ErrorAction SilentlyContinue
 Import-Module PSWriteWord -force -ErrorAction SilentlyContinue
-cls
+Clear-Host
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
 
@@ -47,20 +47,20 @@ foreach ($server in $servers) { #each server start
         $edate = $c.NotAfter.ToString("dd-MM-yyyy")
         $ts = New-TimeSpan -Start $edate -End $today
         if ($ts.days -gt 0 -and $ts.Days -lt 365) {
-            $args = [PSCustomobject]@{
+            $item = [PSCustomobject]@{
                 Name = $server
                 subject = $SJ
                 Thumbprint = $c.Thumbprint
                 Notbefore = $c.notbefore.tostring("dd-MM-yyyy")
                 Notafter = $c.NotAfter.tostring("dd-MM-yyyy")
             }
-            $expired = $expired + $args
+            $expired = $expired + $item
         }
     } #each cert end
 } #each server end
 
 $sortexpired = $expired | Sort-Object $expired.notafter
-$sortexpired | FT -AutoSize
+$sortexpired | Format-Table -AutoSize
 
 Add-WordTable -Table $t -DataTable $sortexpired -Design MediumShading1Accent2 -Alignment left -AutoFit Window -FontSize 10, 7 -ContinueFormatting 
 Add-wordline -WordDocument $newdoc -LineColor darkgray -LineType single -LineSpace 0.2
